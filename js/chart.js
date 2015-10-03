@@ -16,7 +16,7 @@ function get_ajax_data_for_total_user()
     $.each($.parseJSON(jsonData), function(index, element)
     {
         var time_year=0,time_month=0,time_day=0,time_hour=0,time_min=0,time_sec=0,total_user_no=0;
-        console.log(index+" Start");
+        //console.log(index+" Start");
         $.each(element,function(key,value)
         {
             if(key.localeCompare('time_year')==0)
@@ -51,7 +51,7 @@ function get_ajax_data_for_total_user()
         temp_AJAX_data.push([new Date(time_year, time_month,time_day,time_hour,time_min,time_sec),  total_user_no]);
     });
 
-    console.log(temp_AJAX_data);
+    //console.log(temp_AJAX_data);
     data.addRows(temp_AJAX_data);
 
     return data;
@@ -67,8 +67,8 @@ function drawChart_totalUser(div_id)
         {
             title: 'No of Users in Different Time'
         },
-        width: 900,
-        height: 500,
+        width: '100%',
+        height: '100%',
         series:
         {
             // Gives each series an axis name that matches the Y-axis below.
@@ -82,7 +82,12 @@ function drawChart_totalUser(div_id)
             {
                 Temps: {label: 'Total Users'}
             }
-        }
+        }/*,
+        animation:
+        {
+            duration: 1000,
+            easing: 'out',
+        }*/
     };
 
     var materialChart = new google.charts.Line(chartDiv);
@@ -104,3 +109,11 @@ $( window ).resize(function()
       drawChart_totalUser('chart_div');
     }
 });
+
+setInterval(function()
+{
+    if($("#chart_div").length != 0)
+    {
+      drawChart_totalUser('chart_div');
+    }
+}, 20000);
