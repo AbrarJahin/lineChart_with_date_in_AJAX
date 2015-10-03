@@ -1,29 +1,65 @@
 google.load('visualization', '1.1', {packages: ['line', 'corechart']});
 
-function drawChart()
+
+function get_ajax_data_for_total_user()
 {
-    var chartDiv = document.getElementById('chart_div');
     var data = new google.visualization.DataTable();
     data.addColumn('date', 'Time');
-    //data.addColumn('number', "Time");
     data.addColumn('number', "Total Users");
 
-    data.addRows(
-                    [
-                        [new Date(2014, 0,1,1,1,11),  -.5],
-                        [new Date(2014, 0,1,1,1,21),   .4],
-                        [new Date(2014, 0,1,1,1,31),   .5],
-                        [new Date(2014, 0,1,1,1,41),  2.9],
-                        [new Date(2014, 0,1,1,1,51),  6.3],
-                        [new Date(2014, 0,1,1,2,01),    9],
-                        [new Date(2014, 0,1,1,2,11), 10.6],
-                        [new Date(2014, 0,1,1,2,21), 10.3],
-                        [new Date(2014, 0,1,1,2,41),  7.4],
-                        [new Date(2014, 0,1,1,2,51),  4.4],
-                        [new Date(2014, 0,1,1,3,11), 1.1],
-                        [new Date(2014, 0,1,1,3,31), -.2]
-                    ]
-                );
+    var jsonData = $.ajax({
+                              url: "ajax.php",
+                              dataType: "json",
+                              async: false
+                            }).responseText;
+    var temp_AJAX_data=[];
+    $.each($.parseJSON(jsonData), function(index, element)
+    {
+        var time_year=0,time_month=0,time_day=0,time_hour=0,time_min=0,time_sec=0,total_user_no=0;
+        console.log(index+" Start");
+        $.each(element,function(key,value)
+        {
+            if(key.localeCompare('time_year')==0)
+            {
+                time_year=value;
+            }
+            else if(key.localeCompare('time_month')==0)
+            {
+                time_month=value;
+            }
+            else if(key.localeCompare('time_day')==0)
+            {
+                time_day=value;
+            }
+            else if(key.localeCompare('time_hour')==0)
+            {
+                time_hour=value;
+            }
+            else if(key.localeCompare('time_min')==0)
+            {
+                time_min=value;
+            }
+            else if(key.localeCompare('time_sec')==0)
+            {
+                time_sec=value;
+            }
+            else if(key.localeCompare('total_user_no')==0)
+            {
+                total_user_no=value;
+            }
+        });
+        temp_AJAX_data.push([new Date(time_year, time_month,time_day,time_hour,time_min,time_sec),  total_user_no]);
+    });
+
+    console.log(temp_AJAX_data);
+    data.addRows(temp_AJAX_data);
+
+    return data;
+}
+
+function drawChart_totalUser(div_id)
+{
+    var chartDiv = document.getElementById(div_id);
 
     var Options =
     {
@@ -48,18 +84,23 @@ function drawChart()
             }
         }
     };
+
     var materialChart = new google.charts.Line(chartDiv);
-    materialChart.draw(data, Options);
+    materialChart.draw(get_ajax_data_for_total_user(), Options);
 }
 
 $(function()
 {
-    //console.log("loaded");
-    drawChart();
+    if($("#chart_div").length != 0)
+    {
+      drawChart_totalUser('chart_div');
+    }
 });
 
 $( window ).resize(function()
 {
-    //console.log("resize");
-    drawChart();
+    if($("#chart_div").length != 0)
+    {
+      drawChart_totalUser('chart_div');
+    }
 });
